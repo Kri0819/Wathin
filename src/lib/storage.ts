@@ -1,4 +1,4 @@
-// Wathin｜未止 — Storage helpers  v2.0.0
+// Wathin｜未止 — Storage helpers  v2.0.1
 import { v4 as uuidv4 } from 'uuid';
 import type { ShoreBoat } from './types';
 

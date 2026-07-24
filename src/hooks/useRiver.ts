@@ -1,4 +1,4 @@
-// Wathin｜未止 — useRiver hook  v2.0.0
+// Wathin｜未止 — useRiver hook  v2.0.1
 import { useState, useCallback, useRef } from 'react';
 import type { Boat } from '@/lib/types';
 

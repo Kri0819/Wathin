@@ -1,4 +1,4 @@
-// Wathin｜未止 — API: POST /api/boats/create  v2.0.0
+// Wathin｜未止 — API: POST /api/boats/create  v2.0.1
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { v4 as uuidv4 } from 'uuid';
 import { validateMessage } from '@/lib/safety';

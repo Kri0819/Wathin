@@ -1,4 +1,4 @@
-// Wathin｜未止 — API: GET /api/boats/next  v2.0.0
+// Wathin｜未止 — API: GET /api/boats/next  v2.0.1
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { v4 as uuidv4 } from 'uuid';
 import type { Boat } from '@/lib/types';

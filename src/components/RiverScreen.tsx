@@ -1,4 +1,4 @@
-// Wathin｜未止 — RiverScreen  v2.0.0
+// Wathin｜未止 — RiverScreen  v2.0.1
 // 大量留白，聚焦船與文字；整體視覺乾淨、安靜
 'use client';
 import { useEffect, useState } from 'react';
@@ -27,19 +27,42 @@ export default function RiverScreen({ onNavigate, shoreCount, refreshShore }: Pr
   }, [river.boat]);
 
   const receive = async () => {
-    if (!river.boat) return;
-    const now = Date.now();
-    const shoreBoat: ShoreBoat = { id: river.boat.id, text: river.boat.message, at: now, exp: now + 36 * 3_600_000 };
-    const ok = pushShore(shoreBoat);
+    if (!river.boat || shoreCount >= 3) return;
+
+    const currentBoat = river.boat;
     setOpen(false);
-    if (ok) {
-      fetch('/api/boats/receive', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ boatId: river.boat.id, deviceId: getDeviceId() }),
-      }).catch(() => {});
-      refreshShore();
-      river.received();
-    } else river.dismiss();
+
+    try {
+      const response = await fetch('/api/boats/receive', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ boatId: currentBoat.id, deviceId: getDeviceId() }),
+      });
+      const result = (await response.json()) as { ok?: boolean };
+
+      // 若船已離開河流，畫面只安靜換成下一艘，不揭露原因。
+      if (!response.ok || !result.ok) {
+        river.dismiss();
+        return;
+      }
+
+      const now = Date.now();
+      const shoreBoat: ShoreBoat = {
+        id: currentBoat.id,
+        text: currentBoat.message,
+        at: now,
+        exp: now + 36 * 3_600_000,
+      };
+
+      if (pushShore(shoreBoat)) {
+        refreshShore();
+        river.received();
+      } else {
+        river.dismiss();
+      }
+    } catch {
+      river.dismiss();
+    }
   };
   const dismiss = () => { setOpen(false); river.dismiss(); };
 
@@ -68,7 +91,7 @@ export default function RiverScreen({ onNavigate, shoreCount, refreshShore }: Pr
         </div>
       )}
 
-      <NavBar onShore={() => onNavigate('shore')} onCreate={() => onNavigate('create')} shoreCount={shoreCount} />
+      <NavBar active="river" onNavigate={onNavigate} shoreCount={shoreCount} />
 
       {open && river.boat && <BoatOverlay text={river.boat.message} shoreCount={shoreCount} onReceive={receive} onClose={dismiss} />}
     </div>

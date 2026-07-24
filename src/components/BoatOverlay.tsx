@@ -1,4 +1,4 @@
-// Wathin｜未止 — BoatOverlay  v2.0.0
+// Wathin｜未止 — BoatOverlay  v2.0.1
 // 浮層出現：從下方浮起，淡入+位移；浮層半透明，背景仍可見河流
 'use client';
 import { useState, useEffect } from 'react';
@@ -58,7 +58,7 @@ export default function BoatOverlay({ text, shoreCount, onReceive, onClose }: Pr
           <PaperBoat size={88} state={receivedGlow ? 'received' : 'drift'} showReflection={false} />
         </div>
 
-        <p style={{
+        <p data-protected-message="true" onContextMenu={e => e.preventDefault()} style={{
           fontFamily: FONT_BODY, fontSize: 20, fontWeight: 300,
           lineHeight: 1.85, color: COLOR.text, textAlign: 'center',
           margin: `0 0 ${SP.lg}px`, letterSpacing: '0.025em', whiteSpace: 'pre-wrap',

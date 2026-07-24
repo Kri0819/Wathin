@@ -1,4 +1,4 @@
-// Wathin｜未止 — Types  v2.0.0
+// Wathin｜未止 — Types  v2.0.1
 
 export type BoatStatus = 'drifting' | 'held' | 'expired';
 
@@ -18,4 +18,4 @@ export interface ShoreBoat {
   exp: number;  // shoreExpiresAt
 }
 
-export type Screen = 'river' | 'create' | 'shore';
+export type Screen = 'shore' | 'river' | 'message';

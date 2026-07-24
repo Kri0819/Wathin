@@ -1,4 +1,4 @@
-# Wathin｜未止 — v2.0.0
+# Wathin｜未止 — v2.0.1
 
 > 等待未止，水流未止。
 
@@ -13,7 +13,7 @@
 ```bash
 git init
 git add .
-git commit -m "feat: v2.0.0 — rebuilt to design system v1.0 spec"
+git commit -m "feat: v2.0.1 — rebuilt to design system v1.0 spec"
 git remote add origin https://github.com/你的帳號/wathin.git
 git push -u origin main
 ```
@@ -106,4 +106,4 @@ public/
 | 版本 | 內容 |
 |---|---|
 | v1.0.0 – v1.0.9 | 初始迭代，逐步貼近視覺草圖 |
-| **v2.0.0** | 依照完整品牌視覺規範文件重建：精確色彩 token、字體規格、紙船三態、光影系統、間距系統、Motion 規格 |
+| **v2.0.1** | 依照完整品牌視覺規範文件重建：精確色彩 token、字體規格、紙船三態、光影系統、間距系統、Motion 規格 |

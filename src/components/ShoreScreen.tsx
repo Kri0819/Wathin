@@ -1,4 +1,4 @@
-// Wathin｜未止 — ShoreScreen  v2.0.0
+// Wathin｜未止 — ShoreScreen  v2.0.1
 // 卡片式列表，層級清楚，顯示剩餘時間與進度條，最多收藏3則船訊
 'use client';
 import { useState, useEffect, useCallback } from 'react';
@@ -9,9 +9,9 @@ import { loadShore, hoursLeft } from '@/lib/storage';
 import { COLOR, FONT_BODY, SP } from '@/lib/tokens';
 import type { ShoreBoat } from '@/lib/types';
 
-interface Props { onBack: () => void; onCreate: () => void; onUpdate: () => void; }
+interface Props { onNavigate: (screen: import('@/lib/types').Screen) => void; onUpdate: () => void; }
 
-export default function ShoreScreen({ onBack, onCreate, onUpdate }: Props) {
+export default function ShoreScreen({ onNavigate, onUpdate }: Props) {
   const [boats, setBoats] = useState<ShoreBoat[]>([]);
   const [openId, setOpenId] = useState<string | null>(null);
 
@@ -20,11 +20,8 @@ export default function ShoreScreen({ onBack, onCreate, onUpdate }: Props) {
 
   return (
     <div style={{ position: 'fixed', inset: 0, zIndex: 50, background: `linear-gradient(180deg, #010910 0%, ${COLOR.deepBlue} 44%, #0C2542 100%)`, display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
-      <div style={{ flexShrink: 0, paddingTop: `calc(env(safe-area-inset-top,0px)+${SP.xxl + 2}px)`, paddingBottom: SP.base, paddingLeft: SP.lg - 2, paddingRight: SP.lg - 2, position: 'relative', display: 'flex', alignItems: 'center' }}>
-        <button onClick={onBack} style={{ background: 'none', border: 'none', color: 'rgba(159,182,204,0.38)', fontSize: 20, cursor: 'pointer', padding: '4px 8px', lineHeight: 1, flexShrink: 0, transition: 'color 0.16s' }}
-          onMouseEnter={e => (e.currentTarget.style.color = 'rgba(159,182,204,0.80)')}
-          onMouseLeave={e => (e.currentTarget.style.color = 'rgba(159,182,204,0.38)')}>←</button>
-        <div style={{ position: 'absolute', left: 0, right: 0, textAlign: 'center', pointerEvents: 'none' }}>
+      <div style={{ flexShrink: 0, paddingTop: `calc(env(safe-area-inset-top,0px)+${SP.xxl + 2}px)`, paddingBottom: SP.base, paddingLeft: SP.lg - 2, paddingRight: SP.lg - 2, position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ textAlign: 'center', pointerEvents: 'none' }}>
           <h2 style={{ fontFamily: FONT_BODY, fontSize: 19, fontWeight: 400, color: 'rgba(245,249,255,0.95)', margin: 0, letterSpacing: '0.24em' }}>岸邊</h2>
           <p style={{ margin: '4px 0 0', fontFamily: FONT_BODY, fontSize: 12, color: 'rgba(159,182,204,0.38)', letterSpacing: '0.08em' }}>{boats.length} / 3</p>
         </div>
@@ -32,7 +29,7 @@ export default function ShoreScreen({ onBack, onCreate, onUpdate }: Props) {
 
       <div style={{ height: 1, flexShrink: 0, marginBottom: SP.base, background: 'linear-gradient(90deg,transparent,rgba(207,232,255,0.11),transparent)' }} />
 
-      <div style={{ flex: 1, padding: `0 ${SP.base}px ${SP.base}px` }}>
+      <div style={{ flex: 1, padding: `0 ${SP.base}px calc(98px + env(safe-area-inset-bottom,0px))` }}>
         {boats.length === 0 && (
           <div style={{ textAlign: 'center', marginTop: 64, color: 'rgba(159,182,204,0.26)', fontFamily: FONT_BODY, fontSize: 13, letterSpacing: '0.14em', lineHeight: 2.6 }}>
             <div style={{ display: 'flex', justifyContent: 'center', marginBottom: SP.base }}><WathinWave w={36} a={0.14} sw={1.8} /></div>
@@ -62,7 +59,7 @@ export default function ShoreScreen({ onBack, onCreate, onUpdate }: Props) {
                     <PaperBoatMini size={54} fade={fade} />
                   </div>
                   <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', minHeight: 48 }}>
-                    <p style={{ fontFamily: FONT_BODY, fontSize: 13.5, color: 'rgba(245,249,255,0.94)', margin: 0, lineHeight: 1.68, flex: 1, overflow: isOpen ? 'visible' : 'hidden', textOverflow: isOpen ? 'unset' : 'ellipsis', whiteSpace: isOpen ? 'normal' : 'nowrap', transition: 'all 0.26s' }}>{b.text.replace(/\n/g, ' ')}</p>
+                    <p data-protected-message="true" onContextMenu={e => e.preventDefault()} style={{ fontFamily: FONT_BODY, fontSize: 13.5, color: 'rgba(245,249,255,0.94)', margin: 0, lineHeight: 1.68, flex: 1, overflow: isOpen ? 'visible' : 'hidden', textOverflow: isOpen ? 'unset' : 'ellipsis', whiteSpace: isOpen ? 'normal' : 'nowrap', transition: 'all 0.26s' }}>{b.text.replace(/\n/g, ' ')}</p>
                     <p style={{ margin: '6px 0 0', fontSize: 11, color: 'rgba(159,182,204,0.36)', fontFamily: 'monospace', letterSpacing: '0.04em', textAlign: 'right' }}>{hoursLeft(b.exp)}</p>
                   </div>
                 </div>
@@ -71,10 +68,10 @@ export default function ShoreScreen({ onBack, onCreate, onUpdate }: Props) {
           })}
         </div>
 
-        <p style={{ textAlign: 'center', fontFamily: FONT_BODY, fontSize: 11, color: 'rgba(159,182,204,0.17)', letterSpacing: '0.13em', lineHeight: 2.6, marginTop: SP.xl + 8 }}>每艘船都會在岸邊停留 36 小時，<br />然後回到河流，慢慢消散。</p>
+        <p style={{ textAlign: 'center', fontFamily: FONT_BODY, fontSize: 11, color: 'rgba(159,182,204,0.17)', letterSpacing: '0.13em', lineHeight: 2.6, marginTop: SP.xl + 8 }}>每艘船都會在岸邊停留 36 小時，<br />然後永久消散。</p>
       </div>
 
-      <NavBar onShore={() => {}} onCreate={onCreate} shoreCount={boats.length} shoreActive />
+      <NavBar active="shore" onNavigate={onNavigate} shoreCount={boats.length} />
     </div>
   );
 }

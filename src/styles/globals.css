@@ -1,4 +1,4 @@
-/* Wathin｜未止 — Global Styles  v2.0.0 */
+/* Wathin｜未止 — Global Styles  v2.0.1 */
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Noto+Serif+TC:wght@300;400&display=swap');
 
 :root {
@@ -37,4 +37,12 @@ textarea { -webkit-user-select: text !important; user-select: text !important; }
 body {
   padding-top: env(safe-area-inset-top);
   padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* 船訊只能閱讀，不提供選取、複製或拖曳。 */
+[data-protected-message='true'] {
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-user-drag: none;
 }
