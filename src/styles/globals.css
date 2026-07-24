@@ -12,10 +12,10 @@
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-html, body, #__next {
+html, body {
   height: 100%; width: 100%;
   overflow: hidden;
-  background:#050E1C;
+  background: var(--c-deep);
   color: var(--c-text);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -35,7 +35,8 @@ html, body, #__next {
 textarea { -webkit-user-select: text !important; user-select: text !important; }
 
 body {
-  padding: 0;
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 /* 船訊只能閱讀，不提供選取、複製或拖曳。 */

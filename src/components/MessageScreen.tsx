@@ -1,4 +1,4 @@
-// Wathin｜未止 — MessageScreen  v2.0.1
+// Wathin｜未止 — MessageScreen  v2.0.2
 // 極簡輸入頁面，專注輸入，不干擾思緒；提交後紙船折疊動畫 0.6~0.8s
 'use client';
 import { useState, useRef, useEffect } from 'react';
@@ -6,6 +6,7 @@ import { PaperBoat } from './PaperBoat';
 import WathinWave from './WathinWave';
 import NavBar from './NavBar';
 import { validateMessage } from '@/lib/safety';
+import { clearMessageDraft, loadMessageDraft, saveMessageDraft } from '@/lib/storage';
 import { COLOR, FONT_BODY, SP } from '@/lib/tokens';
 import { VISUAL } from '@/lib/visual';
 import type { Screen } from '@/lib/types';
@@ -19,23 +20,53 @@ export default function MessageScreen({ onNavigate, onRelease, shoreCount }: Pro
   const [err, setErr] = useState('');
   const [shake, setShake] = useState(false);
   const [phase, setPhase] = useState<Phase>('idle');
+  const [sending, setSending] = useState(false);
+  const [draftReady, setDraftReady] = useState(false);
   const ta = useRef<HTMLTextAreaElement>(null);
 
-  useEffect(() => { ta.current?.focus(); }, []);
+  useEffect(() => {
+    setText(loadMessageDraft());
+    setDraftReady(true);
+    ta.current?.focus();
+  }, []);
+
+  useEffect(() => {
+    if (!draftReady) return;
+    const timer = window.setTimeout(() => saveMessageDraft(text), 240);
+    return () => window.clearTimeout(timer);
+  }, [text, draftReady]);
 
   const trigShake = () => { setShake(true); setTimeout(() => setShake(false), 460); };
 
-  const submit = () => {
+  const submit = async () => {
+    if (sending) return;
     const t = text.trim();
     if (!t) { trigShake(); return; }
     const v = validateMessage(t);
     if (!v.ok) { setErr(v.reason ?? '字太多了，讓它輕一點吧。'); trigShake(); return; }
     setErr('');
 
-    fetch('/api/boats/create', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: t }),
-    }).catch(() => {});
+    setSending(true);
+    try {
+      const response = await fetch('/api/boats/create', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: t }),
+      });
+      const result = await response.json().catch(() => null) as { error?: string } | null;
+      if (!response.ok) {
+        setErr(result?.error ?? '河面暫時太遠了，這句話還在這裡。');
+        trigShake();
+        return;
+      }
+    } catch {
+      setErr('河面暫時太遠了，這句話還在這裡。稍後再試一次。');
+      trigShake();
+      return;
+    } finally {
+      setSending(false);
+    }
+
+    clearMessageDraft();
 
     setPhase('f1');
     setTimeout(() => setPhase('f2'), 380);
@@ -81,7 +112,7 @@ export default function MessageScreen({ onNavigate, onRelease, shoreCount }: Pro
       </div>
 
       <div style={{ width: '100%', maxWidth: VISUAL.page.contentMaxWidth, animation: shake ? 'eShk 0.46s cubic-bezier(0.36,0.07,0.19,0.97) forwards' : 'none' }}>
-        <textarea ref={ta} value={text}
+        <textarea ref={ta} value={text} aria-label="想放進河裡的話" aria-describedby="message-feedback"
           onChange={e => { setText(e.target.value); setErr(''); }}
           onKeyDown={e => { if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') submit(); }}
           maxLength={120}
@@ -89,24 +120,24 @@ export default function MessageScreen({ onNavigate, onRelease, shoreCount }: Pro
       </div>
 
       <div style={{ width: '100%', maxWidth: VISUAL.page.contentMaxWidth, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginTop: SP.sm, minHeight: 30 }}>
-        <p style={{ fontFamily: FONT_BODY, fontSize: 12, color: 'rgba(207,232,255,0.44)', lineHeight: 1.75, whiteSpace: 'pre-line', flex: 1, paddingRight: SP.md, opacity: err ? 1 : 0, transition: 'opacity 0.20s' }}>{err || ' '}</p>
+        <p id="message-feedback" role="status" aria-live="polite" style={{ fontFamily: FONT_BODY, fontSize: 12, color: 'rgba(207,232,255,0.44)', lineHeight: 1.75, whiteSpace: 'pre-line', flex: 1, paddingRight: SP.md, opacity: err ? 1 : 0, transition: 'opacity 0.20s' }}>{err || ' '}</p>
         <span style={{ fontSize: 12, color: cClr, fontFamily: 'monospace', flexShrink: 0, transition: 'color 0.26s', paddingTop: 1 }}>{text.length}/120</span>
       </div>
 
-      <button onClick={submit} disabled={!text.trim()} style={{
+      <button onClick={submit} disabled={!text.trim() || sending} aria-busy={sending} style={{
         marginTop: SP.md + 1, width: '100%', maxWidth: VISUAL.page.contentMaxWidth, padding: '17px 0',
         background: text.trim() ? `linear-gradient(135deg, ${COLOR.blue}EB, ${COLOR.navy}F8)` : 'rgba(7,26,58,0.28)',
         border: `1.5px solid ${text.trim() ? 'rgba(207,232,255,0.22)' : 'rgba(18,59,99,0.22)'}`,
         borderRadius: 100,
         color: text.trim() ? 'rgba(207,232,255,0.97)' : 'rgba(159,182,204,0.20)',
         fontFamily: FONT_BODY, fontSize: 15, letterSpacing: '0.18em',
-        cursor: text.trim() ? 'pointer' : 'default',
+        cursor: text.trim() && !sending ? 'pointer' : 'default',
         boxShadow: text.trim() ? '0 4px 28px rgba(9,36,86,0.62)' : 'none',
         transition: 'all 0.20s',
       }}
       onMouseEnter={e => { if (text.trim()) e.currentTarget.style.borderColor = 'rgba(207,232,255,0.48)'; }}
       onMouseLeave={e => { if (text.trim()) e.currentTarget.style.borderColor = 'rgba(207,232,255,0.22)'; }}>
-        放進河流
+        {sending ? '放流中…' : '放進河流'}
       </button>
 
       <p style={{ width: '100%', maxWidth: VISUAL.page.contentMaxWidth, fontFamily: FONT_BODY, fontSize: 11, color: 'rgba(159,182,204,0.24)', marginTop: SP.base, letterSpacing: '0.10em', textAlign: 'center', lineHeight: 2 }}>不留下私人資訊、聯絡方式或腥羶色內容。</p>
