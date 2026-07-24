@@ -1,0 +1,40 @@
+/* Wathin｜未止 — Global Styles  v2.0.0 */
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Noto+Serif+TC:wght@300;400&display=swap');
+
+:root {
+  --c-deep:  #071B34;
+  --c-navy:  #0D2A4A;
+  --c-blue:  #123B63;
+  --c-water: #CFE8FF;
+  --c-text:  #F5F9FF;
+  --c-muted: #9FB6CC;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%; width: 100%;
+  overflow: hidden;
+  background: var(--c-deep);
+  color: var(--c-text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+#__next { height: 100%; width: 100%; }
+
+::-webkit-scrollbar { width: 2px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(207,232,255,0.11); border-radius: 1px; }
+
+* { -webkit-tap-highlight-color: transparent; }
+
+textarea { -webkit-user-select: text !important; user-select: text !important; }
+
+body {
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+}

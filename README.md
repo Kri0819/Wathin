@@ -1,0 +1,109 @@
+# Wathin｜未止 — v2.0.0
+
+> 等待未止，水流未止。
+
+匿名漂流紙船 PWA。把一句話折成紙船，放進河流，讓它漂流。沒有社群、沒有回覆、沒有帳號互動。船比人重要，訊息比身份重要，流動比留下重要。
+
+本版本依照《Wathin Visual Design System v1.0》完整重建，包含精確的色彩 token、字體規格、紙船三態、光影系統與動態規格。
+
+---
+
+## 🚀 部署到 Vercel
+
+```bash
+git init
+git add .
+git commit -m "feat: v2.0.0 — rebuilt to design system v1.0 spec"
+git remote add origin https://github.com/你的帳號/wathin.git
+git push -u origin main
+```
+
+接著到 [vercel.com](https://vercel.com) → New Project → Import → Deploy。
+
+---
+
+## 🛠 本地開發
+
+```bash
+npm install
+npm run dev
+# http://localhost:3000
+```
+
+---
+
+## 🎨 設計系統 Token
+
+### 色彩
+| Token | Hex | 用途 |
+|---|---|---|
+| Deep Blue | `#071B34` | 主背景（深夜） |
+| Navy | `#0D2A4A` | 卡片/浮層 |
+| Blue | `#123B63` | 強調/高光 |
+| Water Light | `#CFE8FF` | 主要文字、水面高光 |
+| Text | `#F5F9FF` | 內文 |
+| Muted | `#9FB6CC` | 次要文字 |
+
+### 字體
+- **Cormorant Garamond** (Light/Regular) — Logo、英文標題，字距加寬
+- **Noto Serif TC** (Light/Regular) — 中文內文、介面文字
+
+### 間距系統
+`4 / 8 / 12 / 16 / 24 / 32 / 48 / 64 px`
+
+### Motion
+- 船漂移動：非常緩慢，線性或 ease-in-out
+- 浮層出現：從下方浮起，淡入 + 位移
+- 紙船折疊：平滑過渡 0.6 ~ 0.8s
+- 微光呼吸：低頻呼吸感，8 ~ 12s 一次
+
+---
+
+## 🗂 專案結構
+
+```
+src/
+├── components/
+│   ├── WaterCanvas.tsx     # 月光水面 canvas 動畫
+│   ├── WathinWave.tsx      # 品牌波浪 logo mark（含呼吸動畫）
+│   ├── PaperBoat.tsx       # 紙船三態：靜止/漂浮/被接住(發光)
+│   ├── DriftBoat.tsx       # 單船漂流引擎
+│   ├── BoatOverlay.tsx     # 船訊浮層
+│   ├── NavBar.tsx          # 底部導航
+│   ├── NavIcons.tsx        # 岸邊/寫船圖示
+│   ├── RiverScreen.tsx     # 首頁
+│   ├── CreateScreen.tsx    # 寫船頁面
+│   └── ShoreScreen.tsx     # 岸邊收藏區
+├── hooks/
+│   └── useRiver.ts         # 單船輪流引擎邏輯
+├── lib/
+│   ├── types.ts
+│   ├── tokens.ts           # 設計系統 token（色彩/字體/間距）
+│   ├── storage.ts          # localStorage 持久化
+│   └── safety.ts           # 內容安全過濾
+├── pages/
+│   ├── _app.tsx
+│   ├── _document.tsx
+│   ├── index.tsx
+│   └── api/boats/
+│       ├── next.ts
+│       ├── create.ts
+│       └── receive.ts
+└── styles/
+    └── globals.css
+public/
+├── manifest.json
+├── sw.js
+├── icon-192.png
+├── icon-512.png
+└── favicon.ico
+```
+
+---
+
+## 版本歷史
+
+| 版本 | 內容 |
+|---|---|
+| v1.0.0 – v1.0.9 | 初始迭代，逐步貼近視覺草圖 |
+| **v2.0.0** | 依照完整品牌視覺規範文件重建：精確色彩 token、字體規格、紙船三態、光影系統、間距系統、Motion 規格 |
