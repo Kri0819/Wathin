@@ -87,7 +87,7 @@ export default function MessageScreen({ onNavigate, onRelease, shoreCount }: Pro
     const lb = phase === 'f1' ? '折疊中…' : phase === 'f2' ? '成形中…' : phase === 'boat' ? '好了。' : '放入河流…';
 
     return (
-      <div style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'rgba(2,8,18,0.97)', backdropFilter: 'blur(22px)' }}>
+      <div style={{ position: 'absolute', inset: 0, zIndex: 50, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'rgba(2,8,18,0.97)', backdropFilter: 'blur(22px)' }}>
         <div style={{ animation: an, willChange: 'transform,opacity' }}>
           <PaperBoat size={st >= 2 ? 130 : 100} state={st >= 2 ? 'received' : 'still'} showReflection={st >= 2} />
         </div>
@@ -104,7 +104,7 @@ export default function MessageScreen({ onNavigate, onRelease, shoreCount }: Pro
   }
 
   return (
-    <div style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: `0 ${VISUAL.page.horizontalPadding}px ${VISUAL.page.bottomClearance}px`, background: 'rgba(2,8,18,0.97)', backdropFilter: 'blur(22px)' }}>
+    <div style={{ position: 'absolute', inset: 0, zIndex: 50, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: `0 ${VISUAL.page.horizontalPadding}px ${VISUAL.page.bottomClearance}px`, background: 'rgba(2,8,18,0.97)', backdropFilter: 'blur(22px)' }}>
       <div style={{ width: '100%', maxWidth: VISUAL.page.contentMaxWidth, marginBottom: SP.xl - 6, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: SP.sm }}>
         <WathinWave w={40} a={0.34} sw={1.9} />
         <h1 style={{ fontFamily: FONT_BODY, fontSize: VISUAL.message.titleSize, fontWeight: 400, color: 'rgba(245,249,255,0.95)', letterSpacing: VISUAL.message.titleTracking, margin: 0 }}>船訊</h1>

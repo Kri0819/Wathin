@@ -31,7 +31,7 @@ export default function NavBar({ active, onNavigate, shoreCount }: Props) {
     <nav
       aria-label="主要分頁"
       style={{
-        position: 'fixed',
+        position: 'absolute',
         bottom: 0,
         left: 0,
         right: 0,

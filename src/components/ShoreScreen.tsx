@@ -30,7 +30,7 @@ export default function ShoreScreen({ onNavigate, onUpdate }: Props) {
   };
 
   return (
-    <div style={{ position: 'fixed', inset: 0, zIndex: 50, background: `linear-gradient(180deg, #010910 0%, ${COLOR.deepBlue} 44%, #0C2542 100%)`, display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
+    <div style={{ position: 'absolute', inset: 0, zIndex: 50, background: `linear-gradient(180deg, #010910 0%, ${COLOR.deepBlue} 44%, #0C2542 100%)`, display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
       <div style={{ flexShrink: 0, paddingTop: `calc(env(safe-area-inset-top,0px)+${SP.xxl + 2}px)`, paddingBottom: SP.base, paddingLeft: SP.lg - 2, paddingRight: SP.lg - 2, position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ textAlign: 'center', pointerEvents: 'none' }}>
           <h2 style={{ fontFamily: FONT_BODY, fontSize: 19, fontWeight: 400, color: 'rgba(245,249,255,0.95)', margin: 0, letterSpacing: '0.24em' }}>岸邊</h2>

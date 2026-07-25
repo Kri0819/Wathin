@@ -2,12 +2,17 @@
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Noto+Serif+TC:wght@300;400&display=swap');
 
 :root {
+  --app-height: 100vh;
   --c-deep:  #071B34;
   --c-navy:  #0D2A4A;
   --c-blue:  #123B63;
   --c-water: #CFE8FF;
   --c-text:  #F5F9FF;
   --c-muted: #9FB6CC;
+}
+
+@supports (height: 100lvh) {
+  :root { --app-height: 100lvh; }
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -24,7 +29,7 @@ html, body {
   -webkit-user-select: none;
 }
 
-#__next { position: fixed; inset: 0; height: 100%; width: 100%; background: #010812; overflow: hidden; }
+#__next { position: fixed; top: 0; left: 0; height: var(--app-height); width: 100%; background: #010812; overflow: hidden; }
 
 ::-webkit-scrollbar { width: 2px; }
 ::-webkit-scrollbar-track { background: transparent; }

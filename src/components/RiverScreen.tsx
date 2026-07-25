@@ -67,7 +67,7 @@ export default function RiverScreen({ onNavigate, shoreCount, refreshShore }: Pr
   const dismiss = () => { setOpen(false); river.dismiss(); };
 
   return (
-    <div style={{ position: 'fixed', inset: 0, overflow: 'hidden' }}>
+    <div style={{ position: 'absolute', inset: 0, overflow: 'hidden' }}>
       <div style={{ position: 'absolute', top: `calc(env(safe-area-inset-top,0px) + ${SP.xxl + 4}px)`, left: 0, right: 0, zIndex: 20, pointerEvents: 'none', textAlign: 'center' }}>
         <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: SP.md - 2, marginBottom: SP.sm + 1 }}>
           <span style={{ fontFamily: FONT_LOGO, fontSize: 'clamp(31px,3vw,43px)', fontWeight: 300, color: 'rgba(245,249,255,0.97)', letterSpacing: '0.11em', textShadow: '0 0 52px rgba(207,232,255,0.25),0 2px 26px rgba(0,0,0,0.72)' }}>Wathin</span>

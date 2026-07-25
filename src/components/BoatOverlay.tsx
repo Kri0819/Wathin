@@ -25,7 +25,7 @@ export default function BoatOverlay({ text, shoreCount, onReceive, onClose }: Pr
 
   return (
     <div onClick={close} style={{
-      position: 'fixed', inset: 0, zIndex: 200,
+      position: 'absolute', inset: 0, zIndex: 200,
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       background: 'rgba(2,8,18,0.74)',
       backdropFilter: 'blur(16px) brightness(0.68) saturate(1.25)',
