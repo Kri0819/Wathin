@@ -17,7 +17,7 @@ export default function Home() {
   useEffect(() => { refresh(); }, [refresh]);
 
   return (
-    <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: 'var(--app-height)', overflow: 'hidden', background: '#071B34' }}>
+    <div style={{ position: 'fixed', inset: 0, width: '100%', overflow: 'hidden', background: '#071B34' }}>
       <WaterCanvas />
 
       {screen === 'river' && (

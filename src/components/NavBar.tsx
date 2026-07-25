@@ -37,13 +37,12 @@ export default function NavBar({ active, onNavigate, shoreCount }: Props) {
         right: 0,
         width: '100%',
         height: 92,
-        background: `linear-gradient(0deg,rgba(2,9,17,${nav.backgroundDarkness}) 0%,rgba(2,9,17,0.64) 64%,transparent 100%)`,
+        background: 'transparent',
         display: 'grid',
         gridTemplateColumns: 'repeat(3,minmax(0,1fr))',
         alignItems: 'end',
-        padding: `0 ${nav.horizontalPadding}px 0`,
+        padding: `0 ${nav.horizontalPadding}px 10px`,
         zIndex: 30,
-        borderTop: '1px solid rgba(207,232,255,.07)',
       }}
     >
       {ITEMS.map(({ screen, label }) => {
@@ -71,7 +70,7 @@ export default function NavBar({ active, onNavigate, shoreCount }: Props) {
               gap: nav.itemGap,
               opacity: isActive ? nav.activeOpacity : nav.inactiveOpacity,
               transition: 'opacity 180ms ease, transform 180ms ease',
-              transform: isActive ? 'translateY(15px)' : 'translateY(16px)',
+              transform: isActive ? 'translateY(-1px)' : 'translateY(0)',
             }}
           >
             <span style={{ height: screen === 'river' ? 54 : nav.iconBoxHeight, width: screen === 'river' ? 54 : 44, marginTop: screen === 'river' ? -20 : 0, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', border: screen === 'river' ? `1px solid rgba(207,232,255,${isActive ? .62 : .16})` : '1px solid transparent', background: screen === 'river' ? 'rgba(7,27,52,.82)' : 'transparent', boxShadow: screen === 'river' && isActive ? '0 0 24px rgba(72,157,228,.24),inset 0 0 18px rgba(18,59,99,.48)' : 'none' }}>

@@ -59,7 +59,7 @@ export default function WaterCanvas() {
     return () => { cancelAnimationFrame(frame); window.removeEventListener('resize', resize); };
   }, []);
 
-  return <div aria-hidden="true" style={{ position: 'absolute', inset: 0, zIndex: 0, overflow: 'hidden', background: '#010812' }}>
+  return <div aria-hidden="true" style={{ position: 'fixed', inset: 0, width: '100vw', height: '100%', minHeight: '100dvh', zIndex: 0, overflow: 'hidden', background: '#010812' }}>
     <picture>
       <source media="(max-width:600px)" srcSet="/assets/water-mobile-loop.webp" />
       <img className="river-loop" src="/assets/water-desktop-loop.webp" alt="" draggable={false} decoding="async" />
