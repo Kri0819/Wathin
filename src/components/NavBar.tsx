@@ -71,7 +71,7 @@ export default function NavBar({ active, onNavigate, shoreCount }: Props) {
               gap: nav.itemGap,
               opacity: isActive ? nav.activeOpacity : nav.inactiveOpacity,
               transition: 'opacity 180ms ease, transform 180ms ease',
-              transform: isActive ? 'translateY(19px)' : 'translateY(20px)',
+              transform: isActive ? 'translateY(15px)' : 'translateY(16px)',
             }}
           >
             <span style={{ height: screen === 'river' ? 54 : nav.iconBoxHeight, width: screen === 'river' ? 54 : 44, marginTop: screen === 'river' ? -20 : 0, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', border: screen === 'river' ? `1px solid rgba(207,232,255,${isActive ? .62 : .16})` : '1px solid transparent', background: screen === 'river' ? 'rgba(7,27,52,.82)' : 'transparent', boxShadow: screen === 'river' && isActive ? '0 0 24px rgba(72,157,228,.24),inset 0 0 18px rgba(18,59,99,.48)' : 'none' }}>
