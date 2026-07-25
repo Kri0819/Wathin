@@ -33,7 +33,7 @@ const PRIVATE_PATTERNS: RegExp[] = [
 
 const EXPLICIT_PATTERNS: RegExp[] = [
   // 明確情色、性邀約或裸露內容
-  /(?:約炮|援交|買春|賣春|性交易|一夜情|找床伴|裸聊|裸照|私密照)/i,
+  /(?:約[炮砲泡]|打(?:[炮砲泡]|pao|ㄆㄠ)|援交|買春|賣春|性交易|一夜情|找床伴|裸聊|裸照|私密照)/i,
   /(?:做愛|性交|口交|肛交|自慰|手淫|射精|內射|顏射|潮吹|性侵|強姦|強奸)/i,
   /(?:陰莖|雞巴|龜頭|陰道|屄|乳交|精液|A片|色情片|成人片)/i,
 
@@ -42,8 +42,17 @@ const EXPLICIT_PATTERNS: RegExp[] = [
   /(?:血肉模糊|腦漿|內臟外露|滿地是血|肢解|虐殺)/i,
 ];
 
+function normalizeForSafety(text: string): string {
+  return text
+    .normalize('NFKC')
+    .toLowerCase()
+    .replace(/[\s_.·•\-—~～*＊\/\\|]+/g, '')
+    .replace(/(.)\1{2,}/g, '$1$1');
+}
+
 export function validateMessage(text: unknown): ValidationResult {
   const trimmed = typeof text === 'string' ? text.trim() : '';
+  const normalized = normalizeForSafety(trimmed);
 
   if (!trimmed) {
     return { ok: false, category: 'empty', reason: '先寫下一句話，再把它放進河裡。' };
@@ -53,11 +62,11 @@ export function validateMessage(text: unknown): ValidationResult {
     return { ok: false, category: 'length', reason: '字太多了，讓它輕一點吧。' };
   }
 
-  if (PRIVATE_PATTERNS.some((pattern) => pattern.test(trimmed))) {
+  if (PRIVATE_PATTERNS.some((pattern) => pattern.test(trimmed) || pattern.test(normalized))) {
     return { ok: false, category: 'private', reason: '未止不留下私人資訊或能找到彼此的線索。' };
   }
 
-  if (EXPLICIT_PATTERNS.some((pattern) => pattern.test(trimmed))) {
+  if (EXPLICIT_PATTERNS.some((pattern) => pattern.test(trimmed) || pattern.test(normalized))) {
     return { ok: false, category: 'explicit', reason: '未止不承載情色、血腥或獵奇內容。' };
   }
 

@@ -1,6 +1,7 @@
-// Wathin｜未止 — useRiver hook  v2.0.1
-import { useState, useCallback, useRef } from 'react';
+// Wathin｜未止 — useRiver hook  v2.1.0
+import { useState, useCallback, useEffect, useRef } from 'react';
 import type { Boat } from '@/lib/types';
+import { RIVER } from '@/design-system/river';
 
 async function fetchNextBoat(): Promise<Boat | null> {
   try {
@@ -14,23 +15,27 @@ export function useRiver() {
   const [boat, setBoat] = useState<Boat | null>(null);
   const started = useRef(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const nextDelay = () => RIVER.emptyRiverDelayMin + Math.random() * (RIVER.emptyRiverDelayMax - RIVER.emptyRiverDelayMin);
 
   const schedule = useCallback(() => {
     setBoat(null);
+    if (timer.current) clearTimeout(timer.current);
     timer.current = setTimeout(async () => {
       const b = await fetchNextBoat();
       if (b) setBoat(b); else schedule();
-    }, 900 + Math.random() * 2000);
+    }, nextDelay());
   }, []);
 
   const start = useCallback(() => {
     if (started.current) return;
     started.current = true;
-    setTimeout(async () => {
+    timer.current = setTimeout(async () => {
       const b = await fetchNextBoat();
       if (b) setBoat(b); else schedule();
-    }, 500);
+    }, nextDelay());
   }, [schedule]);
+
+  useEffect(() => () => { if (timer.current) clearTimeout(timer.current); }, []);
 
   return { boat, start, dismiss: schedule, exit: schedule, received: schedule };
 }

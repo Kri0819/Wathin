@@ -1,42 +1,37 @@
-// Wathin｜未止 — DriftBoat  v2.0.0
-// 船自右向左緩慢漂流，非常緩慢
 'use client';
-import { useEffect, useRef, useState } from 'react';
+import { useMemo } from 'react';
 import { PaperBoat } from './PaperBoat';
+import { BOAT } from '@/design-system/boat';
 
 interface Props { onTap: () => void; onExit: () => void; }
 
 export default function DriftBoat({ onTap, onExit }: Props) {
-  const [pos, setPos] = useState({ x: -220, y: 0, rot: 0, op: 0 });
-  const raf = useRef<number>(0);
-
-  useEffect(() => {
-    const spd = 0.16 + Math.random() * 0.12;
-    const by = window.innerHeight * (0.50 + Math.random() * 0.08) - 70;
-    let x = -220, ph = Math.random() * Math.PI * 2;
-    const go = () => {
-      x += spd; ph += 0.008;
-      const y = by + Math.sin(ph) * 9 + Math.cos(ph * 0.55) * 4;
-      const rot = Math.sin(ph * 0.55) * 2.4;
-      const W = window.innerWidth;
-      const fi = Math.min(1, (x + 220) / 180);
-      const fo = Math.min(1, Math.max(0, (W + 200 - x) / 180));
-      setPos({ x, y, rot, op: Math.max(0, fi * fo) });
-      if (x > W + 220) { onExit(); return; }
-      raf.current = requestAnimationFrame(go);
-    };
-    go();
-    return () => cancelAnimationFrame(raf.current);
-  }, [onExit]);
+  const motion = useMemo(() => ({
+    top: `${50 + Math.random() * 8}%`,
+    duration: `${BOAT.driftSecondsMin + Math.random() * (BOAT.driftSecondsMax - BOAT.driftSecondsMin)}s`,
+    delay: `${Math.random() * 0.8}s`,
+  }), []);
 
   return (
-    <div onClick={onTap} style={{
-      position: 'absolute', left: pos.x, top: pos.y,
-      transform: `rotate(${pos.rot}deg) translateX(-50%)`,
-      opacity: pos.op, cursor: 'pointer', zIndex: 10,
-      padding: 30, margin: -30, willChange: 'transform,opacity',
-    }}>
-      <PaperBoat size={130} state="drift" showReflection />
-    </div>
+    <button type="button" aria-label="輕觸紙船，讀一則船訊" onClick={onTap} onAnimationEnd={event => {
+      if (event.animationName === 'boat-crossing') onExit();
+    }} className="drift-boat" style={{ top: motion.top, animationDuration: motion.duration, animationDelay: motion.delay }}>
+      <span className="drift-float">
+        <span className="boat-ripple boat-ripple-one" />
+        <span className="boat-ripple boat-ripple-two" />
+        <PaperBoat size={BOAT.desktopScale} state="drift" showReflection />
+      </span>
+      <style>{`
+        .drift-boat{position:absolute;left:-190px;z-index:12;width:190px;height:150px;padding:0;border:0;background:transparent;cursor:pointer;opacity:0;animation-name:boat-crossing;animation-timing-function:linear;animation-fill-mode:forwards;will-change:transform,opacity}
+        .drift-float{position:relative;display:flex;align-items:center;justify-content:center;animation:boat-floating 3.6s ease-in-out infinite;will-change:transform}
+        .boat-ripple{position:absolute;left:50%;top:64%;height:7px;border:1px solid rgba(207,232,255,.18);border-left-color:transparent;border-right-color:transparent;border-radius:50%;transform:translate(-50%,-50%);animation:ripple-breathe 3.6s ease-in-out infinite}
+        .boat-ripple-one{width:156px}.boat-ripple-two{width:116px;animation-delay:-1.1s;opacity:.55}
+        @keyframes boat-crossing{0%{transform:translateX(0) scale(.72);opacity:0}8%{opacity:.38}19%{opacity:1}82%{opacity:1}94%{opacity:.42}100%{transform:translateX(calc(100vw + 380px)) scale(1.02);opacity:0}}
+        @keyframes boat-floating{0%,100%{transform:translateY(4px) rotate(-2deg)}50%{transform:translateY(-4px) rotate(2.2deg)}}
+        @keyframes ripple-breathe{0%,100%{transform:translate(-50%,-50%) scaleX(.82);opacity:.12}50%{transform:translate(-50%,-50%) scaleX(1.08);opacity:.3}}
+        @media(max-width:480px){.drift-boat{width:168px}.drift-float svg{width:${BOAT.mobileScale}px;height:auto}}
+        @media(prefers-reduced-motion:reduce){.drift-boat{left:50%;transform:translateX(-50%);opacity:1;animation:none}.drift-float,.boat-ripple{animation:none}}
+      `}</style>
+    </button>
   );
 }

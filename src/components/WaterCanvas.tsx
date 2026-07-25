@@ -1,101 +1,181 @@
-// Wathin｜未止 — WaterCanvas  v2.0.0
 'use client';
 import { useEffect, useRef } from 'react';
+import { COLORS } from '@/design-system/colors';
+import { MOON } from '@/design-system/moon';
+import { RIVER } from '@/design-system/river';
+
+type Star = { x: number; y: number; r: number; alpha: number; phase: number; speed: number };
+type Wave = { y: number; x: number; width: number; amp: number; alpha: number; speed: number; phase: number };
+
+const seeded = (seed: number) => () => {
+  seed = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+  seed ^= seed + Math.imul(seed ^ (seed >>> 7), 61 | seed);
+  return ((seed ^ (seed >>> 14)) >>> 0) / 4294967296;
+};
 
 export default function WaterCanvas() {
-  const ref = useRef<HTMLCanvasElement>(null);
-  const raf = useRef<number>(0);
-  const t   = useRef(0);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    const cv = ref.current; if (!cv) return;
-    const cx = cv.getContext('2d')!;
-    const rng = (s: number) => { let v = (s * 1664525 + 1013904223) | 0; return () => { v = (Math.imul(v, 1664525) + 1013904223) | 0; return (v >>> 0) / 2 ** 32; }; };
-    const lr = rng(42), sr = rng(17);
-    const N = 60;
-    const L = Array.from({ length: N }, () => { const a=lr(),b=lr(),c=lr(),d=lr(),e=lr(); return { a,b,c,d,e, bright: e > 0.76 }; });
-    const STARS = Array.from({ length: 14 }, () => ({ x: sr(), y: sr()*0.36, r: 0.4+sr()*0.7, ph: sr()*6.28, period: 8+sr()*4 }));
-    const resize = () => { cv.width = window.innerWidth; cv.height = window.innerHeight; };
-    resize(); window.addEventListener('resize', resize);
+    const canvas = canvasRef.current;
+    const context = canvas?.getContext('2d');
+    if (!canvas || !context) return;
 
-    const draw = () => {
-      t.current += 0.0036;
-      const T = t.current, W = cv.width, H = cv.height;
+    const random = seeded(20260724);
+    const stars: Star[] = Array.from({ length: RIVER.starCount }, () => ({
+      x: 0.04 + random() * 0.92,
+      y: 0.035 + random() * 0.29,
+      r: 0.45 + random() * 1.2,
+      alpha: 0.18 + random() * 0.55,
+      phase: random() * Math.PI * 2,
+      speed: 0.22 + random() * 0.42,
+    }));
+    const makeWaves = (count: number, far: boolean): Wave[] => Array.from({ length: count }, (_, index) => ({
+      y: (far ? 0.37 : 0.43) + (index / count) * (far ? 0.26 : 0.56),
+      x: random(),
+      width: (far ? 0.05 : 0.09) + random() * (far ? 0.20 : 0.34),
+      amp: (far ? 0.7 : 1.2) + random() * (far ? 1.2 : 2.4),
+      alpha: (far ? 0.04 : 0.055) + random() * (far ? 0.105 : 0.16),
+      speed: (random() - 0.5) * (far ? 0.11 : 0.18),
+      phase: random() * Math.PI * 2,
+    }));
+    const waves = [...makeWaves(RIVER.farWaveCount, true), ...makeWaves(RIVER.nearWaveCount, false)];
+    let width = 0;
+    let height = 0;
+    let frame = 0;
+    let start = performance.now();
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-      const bg = cx.createLinearGradient(0,0,0,H);
-      bg.addColorStop(0,'#020911'); bg.addColorStop(0.22,'#061829');
-      bg.addColorStop(0.50,'#081E37'); bg.addColorStop(0.80,'#0A2342'); bg.addColorStop(1,'#0C2747');
-      cx.fillStyle=bg; cx.fillRect(0,0,W,H);
-
-      const MX=W*0.73, MY=H*0.135;
-      const atm=cx.createRadialGradient(MX,MY,0,MX,MY,H*0.46);
-      atm.addColorStop(0,'rgba(220,242,255,0.13)'); atm.addColorStop(0.14,'rgba(205,232,255,0.07)');
-      atm.addColorStop(0.40,'rgba(190,222,255,0.025)'); atm.addColorStop(1,'rgba(0,0,0,0)');
-      cx.fillStyle=atm; cx.fillRect(0,0,W,H);
-
-      const mc=cx.createRadialGradient(MX,MY,0,MX,MY,W*0.030);
-      mc.addColorStop(0,'rgba(255,253,248,1)'); mc.addColorStop(0.28,'rgba(248,252,255,0.94)');
-      mc.addColorStop(0.58,'rgba(225,242,255,0.60)'); mc.addColorStop(1,'rgba(180,218,255,0)');
-      cx.fillStyle=mc; cx.beginPath(); cx.arc(MX,MY,W*0.032,0,Math.PI*2); cx.fill();
-
-      const HY=H*0.44;
-      const hg=cx.createLinearGradient(0,HY-80,0,HY+60);
-      hg.addColorStop(0,'rgba(207,232,255,0)'); hg.addColorStop(0.5,'rgba(207,232,255,0.02)'); hg.addColorStop(1,'rgba(207,232,255,0)');
-      cx.fillStyle=hg; cx.fillRect(0,HY-80,W,140);
-
-      const WT=H*0.41;
-      for (let i=0;i<N;i++){
-        const {a:r1,b:r2,c:r3,d:r4,e:r5,bright}=L[i];
-        const p=i/N;
-        const by=WT+(H-WT)*p;
-        const y=by+Math.sin(T*0.32+i*0.6+r1*2)*3.0;
-        let alpha: number;
-        if (bright) { const pulse=Math.pow(Math.sin(T*0.55+i*1.5)*0.5+0.5,0.6); alpha=(0.150-p*0.09)*pulse; }
-        else alpha=0.05-p*0.035;
-        alpha=Math.max(0,alpha+Math.sin(T*1.7+i*2.2+r2*5)*0.008);
-        if (alpha<0.004) continue;
-        const span=Math.min(0.97,r1*0.52+0.22+(bright?0.20:0));
-        const lw=W*span;
-        const sx=(W-lw)*(r2*0.70+0.08);
-        const lg=cx.createLinearGradient(sx,0,sx+lw,0);
-        lg.addColorStop(0,'rgba(207,232,255,0)'); lg.addColorStop(0.07,`rgba(218,242,255,${alpha*0.5})`);
-        lg.addColorStop(0.30,`rgba(222,244,255,${alpha})`); lg.addColorStop(0.70,`rgba(222,244,255,${alpha})`);
-        lg.addColorStop(0.93,`rgba(218,242,255,${alpha*0.5})`); lg.addColorStop(1,'rgba(207,232,255,0)');
-        cx.beginPath(); cx.moveTo(sx,y);
-        for (let x=sx;x<=sx+lw;x+=5){
-          const w=Math.sin((x/W)*Math.PI*2.6+T*0.62+i*0.5)*1.8+Math.sin((x/W)*Math.PI*6.8-T*0.82+r3*6)*0.8;
-          cx.lineTo(x,y+w);
-        }
-        cx.strokeStyle=lg; cx.lineWidth=r5>0.82?0.95:0.45+r4*0.35; cx.stroke();
-      }
-
-      for (let i=0;i<22;i++){
-        const ry=H*0.46+i*H*0.026; if(ry>H)break;
-        const rw=W*(0.072-i*0.0026); if(rw<=0)continue;
-        const pulse=Math.sin(T*0.85+i*0.82)*0.5+0.5;
-        const ra=Math.max(0,(0.060-i*0.0025)*pulse); if(ra<0.003)continue;
-        const rg=cx.createLinearGradient(MX-rw,0,MX+rw,0);
-        rg.addColorStop(0,'rgba(230,246,255,0)'); rg.addColorStop(0.30,`rgba(240,252,255,${ra*0.7})`);
-        rg.addColorStop(0.5,`rgba(250,255,255,${ra})`); rg.addColorStop(0.70,`rgba(240,252,255,${ra*0.7})`);
-        rg.addColorStop(1,'rgba(230,246,255,0)');
-        cx.fillStyle=rg; cx.fillRect(MX-rw,ry,rw*2,1.4+pulse*1.0);
-      }
-
-      for (const s of STARS) {
-        const a=0.14+Math.sin((T*2*Math.PI)/(s.period*0.15)+s.ph)*0.12;
-        cx.beginPath(); cx.arc(s.x*W,s.y*H,s.r,0,Math.PI*2);
-        cx.fillStyle=`rgba(242,252,255,${Math.max(0,a)})`; cx.fill();
-      }
-
-      const vig=cx.createRadialGradient(W*.5,H*.46,H*.05,W*.5,H*.46,H*.92);
-      vig.addColorStop(0,'rgba(2,9,17,0)'); vig.addColorStop(0.6,'rgba(2,9,17,0.04)'); vig.addColorStop(1,'rgba(2,9,17,0.48)');
-      cx.fillStyle=vig; cx.fillRect(0,0,W,H);
-
-      raf.current = requestAnimationFrame(draw);
+    const resize = () => {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      width = window.innerWidth;
+      height = window.innerHeight;
+      canvas.width = Math.round(width * dpr);
+      canvas.height = Math.round(height * dpr);
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
+      context.setTransform(dpr, 0, 0, dpr, 0, 0);
     };
-    draw();
-    return () => { cancelAnimationFrame(raf.current); window.removeEventListener('resize', resize); };
+
+    const drawWave = (wave: Wave, time: number) => {
+      const y = wave.y * height;
+      const span = wave.width * width;
+      const x = (wave.x * width + Math.sin(time * wave.speed + wave.phase) * width * 0.025) - span / 2;
+      const gradient = context.createLinearGradient(x, 0, x + span, 0);
+      gradient.addColorStop(0, 'rgba(207,232,255,0)');
+      gradient.addColorStop(0.2, `rgba(207,232,255,${wave.alpha * 0.52})`);
+      gradient.addColorStop(0.5, `rgba(229,244,255,${wave.alpha})`);
+      gradient.addColorStop(0.8, `rgba(207,232,255,${wave.alpha * 0.46})`);
+      gradient.addColorStop(1, 'rgba(207,232,255,0)');
+      context.beginPath();
+      for (let step = 0; step <= 28; step += 1) {
+        const progress = step / 28;
+        const px = x + span * progress;
+        const py = y + Math.sin(progress * Math.PI * 2.4 + time * 0.33 + wave.phase) * wave.amp;
+        if (!step) context.moveTo(px, py); else context.lineTo(px, py);
+      }
+      context.strokeStyle = gradient;
+      context.lineWidth = wave.y > 0.7 ? 0.8 : 0.52;
+      context.stroke();
+    };
+
+    const draw = (now: number) => {
+      const time = reduced ? 0 : (now - start) / 1000;
+      const horizon = height * RIVER.horizonRatio;
+      const moonX = width * MOON.xRatio;
+      const moonY = height * MOON.yRatio;
+
+      const sky = context.createLinearGradient(0, 0, 0, height);
+      sky.addColorStop(0, COLORS.nightTop);
+      sky.addColorStop(0.31, COLORS.nightMid);
+      sky.addColorStop(0.43, COLORS.horizon);
+      sky.addColorStop(0.47, COLORS.waterDeep);
+      sky.addColorStop(1, COLORS.deepBlue);
+      context.fillStyle = sky;
+      context.fillRect(0, 0, width, height);
+
+      const haze = context.createRadialGradient(moonX, moonY, 0, moonX, moonY, Math.min(MOON.haze, width * 0.65));
+      haze.addColorStop(0, 'rgba(207,232,255,0.15)');
+      haze.addColorStop(0.3, 'rgba(135,190,235,0.052)');
+      haze.addColorStop(1, 'rgba(75,140,200,0)');
+      context.fillStyle = haze;
+      context.fillRect(0, 0, width, horizon + 80);
+
+      stars.forEach((star) => {
+        const flicker = star.alpha * (0.74 + Math.sin(time * star.speed + star.phase) * 0.26);
+        context.beginPath();
+        context.arc(star.x * width, star.y * height, star.r, 0, Math.PI * 2);
+        context.fillStyle = `rgba(242,249,255,${flicker})`;
+        context.fill();
+      });
+
+      const outer = context.createRadialGradient(moonX, moonY, MOON.size, moonX, moonY, MOON.outerGlow);
+      outer.addColorStop(0, 'rgba(236,248,255,0.48)');
+      outer.addColorStop(0.22, 'rgba(207,232,255,0.17)');
+      outer.addColorStop(1, 'rgba(207,232,255,0)');
+      context.fillStyle = outer;
+      context.beginPath(); context.arc(moonX, moonY, MOON.outerGlow, 0, Math.PI * 2); context.fill();
+      const bloom = context.createRadialGradient(moonX - 1.5, moonY - 1.5, 0, moonX, moonY, MOON.innerBloom);
+      bloom.addColorStop(0, '#fffdf7');
+      bloom.addColorStop(0.22, '#f5fbff');
+      bloom.addColorStop(0.42, 'rgba(215,238,255,0.72)');
+      bloom.addColorStop(1, 'rgba(207,232,255,0)');
+      context.fillStyle = bloom;
+      context.beginPath(); context.arc(moonX, moonY, MOON.innerBloom, 0, Math.PI * 2); context.fill();
+
+      const horizonGlow = context.createLinearGradient(0, horizon - 55, 0, horizon + 75);
+      horizonGlow.addColorStop(0, 'rgba(120,179,224,0)');
+      horizonGlow.addColorStop(0.48, 'rgba(120,179,224,0.055)');
+      horizonGlow.addColorStop(1, 'rgba(120,179,224,0)');
+      context.fillStyle = horizonGlow;
+      context.fillRect(0, horizon - 55, width, 130);
+
+      const waterBloom = context.createRadialGradient(moonX, horizon + 70, 8, moonX, horizon + 130, width * .62);
+      waterBloom.addColorStop(0, 'rgba(34,93,144,.16)');
+      waterBloom.addColorStop(.36, 'rgba(18,66,112,.08)');
+      waterBloom.addColorStop(1, 'rgba(4,19,39,0)');
+      context.fillStyle = waterBloom;
+      context.fillRect(0, horizon - 10, width, height - horizon + 10);
+
+      waves.forEach((wave) => drawWave(wave, time));
+
+      for (let band = 0; band < RIVER.reflectionBands; band += 1) {
+        const progress = band / (RIVER.reflectionBands - 1);
+        const y = horizon + 12 + progress * (height - horizon) * 0.82;
+        if (band % 3 === 1) continue;
+        const centerShift = Math.sin(band * 1.71 + time * 0.18) * width * (0.006 + progress * 0.012);
+        const half = width * (0.012 + progress * 0.105) * (0.55 + ((band * 17) % 9) / 10);
+        const pulse = 0.52 + Math.sin(time * 0.72 + band * 1.23) * 0.22;
+        const alpha = RIVER.reflectionStrength * (1 - progress * 0.68) * pulse;
+        const gradient = context.createLinearGradient(moonX + centerShift - half, 0, moonX + centerShift + half, 0);
+        gradient.addColorStop(0, 'rgba(236,249,255,0)');
+        gradient.addColorStop(0.25, `rgba(224,243,255,${alpha * 0.58})`);
+        gradient.addColorStop(0.5, `rgba(248,253,255,${alpha})`);
+        gradient.addColorStop(0.75, `rgba(224,243,255,${alpha * 0.58})`);
+        gradient.addColorStop(1, 'rgba(236,249,255,0)');
+        context.fillStyle = gradient;
+        context.fillRect(moonX + centerShift - half, y, half * 2, 0.7 + progress * 1.25);
+      }
+
+      const vignette = context.createRadialGradient(width * 0.5, height * 0.48, height * 0.09, width * 0.5, height * 0.48, Math.max(width, height) * 0.72);
+      vignette.addColorStop(0, 'rgba(0,0,0,0)');
+      vignette.addColorStop(0.66, 'rgba(0,4,12,0.08)');
+      vignette.addColorStop(1, `rgba(0,4,12,${RIVER.vignetteOpacity})`);
+      context.fillStyle = vignette;
+      context.fillRect(0, 0, width, height);
+
+      if (!reduced) frame = requestAnimationFrame(draw);
+    };
+
+    resize();
+    window.addEventListener('resize', resize);
+    frame = requestAnimationFrame(draw);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener('resize', resize);
+      start = 0;
+    };
   }, []);
 
-  return <canvas ref={ref} style={{ position:'fixed', inset:0, zIndex:0, pointerEvents:'none' }} />;
+  return <canvas ref={canvasRef} aria-hidden="true" style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none' }} />;
 }

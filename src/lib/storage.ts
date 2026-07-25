@@ -37,6 +37,12 @@ export function pushShore(boat: ShoreBoat): boolean {
   return true;
 }
 
+export function releaseShore(id: string): ShoreBoat[] {
+  const boats = loadShore().filter((boat) => boat.id !== id);
+  saveShore(boats);
+  return boats;
+}
+
 export function loadMessageDraft(): string {
   if (typeof window === 'undefined') return '';
   try { return localStorage.getItem(DRAFT_KEY) ?? ''; }

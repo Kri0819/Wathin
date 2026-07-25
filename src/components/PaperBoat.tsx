@@ -1,72 +1,64 @@
-// Wathin｜未止 — PaperBoat  v2.0.0
-// 三態：靜止 / 漂浮 / 被接住(發光)
+import { useId } from 'react';
+import { BOAT } from '@/design-system/boat';
+
 interface PaperBoatProps {
   size?: number;
   state?: 'still' | 'drift' | 'received';
   showReflection?: boolean;
 }
 
-export function PaperBoat({ size = 120, state = 'drift', showReflection = true }: PaperBoatProps) {
-  const isReceived = state === 'received';
-  const isStill = state === 'still';
-  const baseOpacity = isStill ? 0.55 : 1;
-
-  const filter = isReceived
-    ? 'drop-shadow(0 0 24px rgba(207,232,255,1.0)) drop-shadow(0 0 10px rgba(255,255,255,0.7)) drop-shadow(0 4px 16px rgba(0,0,0,0.4))'
-    : `drop-shadow(0 10px 38px rgba(0,0,0,${0.78 * baseOpacity})) drop-shadow(0 2px 8px rgba(0,0,0,${0.5 * baseOpacity}))`;
-
-  const svgH = showReflection ? 130 : 75;
+export function PaperBoat({ size = 132, state = 'drift', showReflection = true }: PaperBoatProps) {
+  const rawId = useId();
+  const id = rawId.replace(/:/g, '');
+  const received = state === 'received';
+  const still = state === 'still';
+  const height = showReflection ? 118 : 82;
 
   return (
-    <svg width={size} height={size * (svgH / 120)} viewBox={`0 0 120 ${svgH}`} fill="none"
-      style={{ display: 'block', overflow: 'visible', filter, opacity: baseOpacity,
-        transition: 'filter 0.6s ease, opacity 0.6s ease' }}>
+    <svg width={size} height={size * (height / 160)} viewBox={`0 0 160 ${height}`} fill="none" aria-hidden="true"
+      style={{ display: 'block', overflow: 'visible', opacity: still ? 0.68 : 1,
+        filter: received
+          ? 'drop-shadow(0 0 22px rgba(207,232,255,.82)) drop-shadow(0 7px 18px rgba(0,0,0,.52))'
+          : `drop-shadow(0 12px 22px rgba(0,0,0,${BOAT.shadowOpacity})) drop-shadow(0 2px 5px rgba(4,12,28,.72))`,
+        transition: 'filter .55s ease, opacity .55s ease' }}>
+      <defs>
+        <linearGradient id={`${id}left`} x1="28" y1="38" x2="82" y2="78" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#F9FBFC"/><stop offset=".55" stopColor="#D7E1E9"/><stop offset="1" stopColor="#AFC1D1"/>
+        </linearGradient>
+        <linearGradient id={`${id}right`} x1="132" y1="35" x2="77" y2="81" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#FFFFFF"/><stop offset=".5" stopColor="#E7EEF3"/><stop offset="1" stopColor="#B9CAD8"/>
+        </linearGradient>
+        <linearGradient id={`${id}center`} x1="80" y1="11" x2="80" y2="77" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#FFFFFF"/><stop offset=".62" stopColor="#E8EEF2"/><stop offset="1" stopColor="#BAC9D5"/>
+        </linearGradient>
+        <linearGradient id={`${id}hull`} x1="26" y1="67" x2="130" y2="88" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#BCCBD6"/><stop offset=".38" stopColor="#F4F7F9"/><stop offset=".72" stopColor="#D6E0E7"/><stop offset="1" stopColor="#8FA5B7"/>
+        </linearGradient>
+        <linearGradient id={`${id}reflection`} x1="80" y1="90" x2="80" y2="117" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#CFE8FF" stopOpacity=".20"/><stop offset="1" stopColor="#CFE8FF" stopOpacity="0"/>
+        </linearGradient>
+      </defs>
 
-      <path d="M 42 8 L 88 60 L 42 60 Z" fill="rgba(248,252,255,0.96)" stroke="rgba(207,232,255,0.20)" strokeWidth="0.4" />
-      <path d="M 42 8 L 42 60 L 52 60 Z" fill="rgba(180,215,245,0.18)" />
-      <path d="M 68 24 L 88 60 L 75 60 Z" fill="rgba(255,255,255,0.12)" />
-      <line x1="42" y1="8" x2="42" y2="62" stroke="rgba(207,232,255,0.55)" strokeWidth="0.9" strokeLinecap="round" />
+      <ellipse cx="80" cy="80" rx="58" ry="8" fill="rgba(1,7,17,.54)" />
+      <path d="M17 53 L80 77 L48 80 Z" fill={`url(#${id}left)`} stroke="rgba(255,255,255,.52)" strokeWidth=".65"/>
+      <path d="M143 48 L80 77 L112 81 Z" fill={`url(#${id}right)`} stroke="rgba(255,255,255,.58)" strokeWidth=".65"/>
+      <path d="M80 9 L48 80 L80 70 L112 81 Z" fill={`url(#${id}center)`} stroke="rgba(255,255,255,.7)" strokeWidth=".72"/>
+      <path d="M17 53 L47 80 L80 70 L112 81 L143 48 L126 88 L42 88 Z" fill={`url(#${id}hull)`} stroke="rgba(224,238,248,.62)" strokeWidth=".75"/>
+      <path d="M17 53 L80 70 L42 88 Z" fill="rgba(126,151,171,.30)"/>
+      <path d="M143 48 L80 70 L126 88 Z" fill="rgba(255,255,255,.20)"/>
+      <path d="M80 9 L80 70 M17 53 L80 70 L143 48 M42 88 L80 70 L126 88" stroke="rgba(102,128,151,.55)" strokeWidth=".75" strokeLinecap="round"/>
+      <path d="M22 55 L80 76 L138 51" stroke="rgba(255,255,255,.55)" strokeWidth=".55"/>
+      <path d="M42 88 Q80 94 126 88" stroke="rgba(2,14,31,.48)" strokeWidth="1.3"/>
 
-      <path d="M 18 62 L 96 62 Q 96 66 78 70 L 57 74 L 36 70 Q 18 66 18 62 Z"
-        fill="rgba(248,252,255,0.97)" stroke="rgba(207,232,255,0.18)" strokeWidth="0.4" />
-      <path d="M 18 62 L 42 62 L 42 63 L 36 70 Q 18 66 18 62 Z" fill="rgba(185,218,245,0.30)" />
-      <path d="M 42 62 L 96 62 Q 96 66 78 70 L 57 74 L 42 63 Z" fill="rgba(240,250,255,0.15)" />
-      <line x1="42" y1="62" x2="57" y2="74" stroke="rgba(180,210,240,0.35)" strokeWidth="0.6" strokeLinecap="round" />
-      <line x1="18" y1="62" x2="96" y2="62" stroke="rgba(207,232,255,0.20)" strokeWidth="0.5" />
-
-      {showReflection && (
-        <>
-          <ellipse cx="57" cy="74.5" rx="42" ry="4" fill="rgba(207,232,255,0.08)" />
-          <g>
-            <path d="M 24 79 Q 42 82 57 81 Q 72 82 90 79 Q 85 84 57 87 Q 29 84 24 79 Z" fill="rgba(207,232,255,0.07)" />
-            <path d="M 42 76 L 57 81 L 42 81 Z" fill="rgba(207,232,255,0.05)" />
-            <line x1="22" y1="78"  x2="92" y2="78"  stroke="rgba(207,232,255,0.14)" strokeWidth="0.75" />
-            <line x1="24" y1="82"  x2="90" y2="82"  stroke="rgba(207,232,255,0.10)" strokeWidth="0.68" />
-            <line x1="27" y1="86"  x2="87" y2="86"  stroke="rgba(207,232,255,0.07)" strokeWidth="0.60" />
-            <line x1="31" y1="90"  x2="83" y2="90"  stroke="rgba(207,232,255,0.05)" strokeWidth="0.52" />
-            <line x1="35" y1="94"  x2="79" y2="94"  stroke="rgba(207,232,255,0.035)" strokeWidth="0.46" />
-            <line x1="39" y1="98"  x2="75" y2="98"  stroke="rgba(207,232,255,0.022)" strokeWidth="0.40" />
-          </g>
-        </>
-      )}
+      {showReflection && <>
+        <ellipse cx="80" cy="91" rx="54" ry="4" fill="rgba(207,232,255,.10)"/>
+        <path d="M43 94 Q80 99 119 94 L110 109 Q80 115 50 108 Z" fill={`url(#${id}reflection)`} opacity=".62"/>
+        <path d="M21 96 Q47 92 69 96 T139 96 M31 102 Q55 99 77 102 T130 102 M44 109 Q66 106 83 109 T117 109" stroke="rgba(207,232,255,.13)" strokeWidth=".7" strokeLinecap="round"/>
+      </>}
     </svg>
   );
 }
 
-export function PaperBoatMini({ size = 54, fade = 1 }: { size?: number; fade?: number }) {
-  return (
-    <svg width={size} height={size * 1.08} viewBox="0 0 120 130" fill="none"
-      style={{ display: 'block', filter: `drop-shadow(0 4px 16px rgba(0,0,0,${0.72 * fade}))`, opacity: fade }}>
-      <path d="M 42 8 L 88 60 L 42 60 Z" fill="rgba(248,252,255,0.94)" stroke="rgba(207,232,255,0.15)" strokeWidth="0.4" />
-      <path d="M 42 8 L 42 60 L 52 60 Z" fill="rgba(180,215,245,0.16)" />
-      <line x1="42" y1="8" x2="42" y2="62" stroke="rgba(207,232,255,0.52)" strokeWidth="0.9" strokeLinecap="round" />
-      <path d="M 18 62 L 96 62 Q 96 66 78 70 L 57 74 L 36 70 Q 18 66 18 62 Z" fill="rgba(248,252,255,0.96)" stroke="rgba(207,232,255,0.15)" strokeWidth="0.4" />
-      <path d="M 18 62 L 42 62 L 42 63 L 36 70 Q 18 66 18 62 Z" fill="rgba(185,218,245,0.26)" />
-      <line x1="42" y1="62" x2="57" y2="74" stroke="rgba(180,210,240,0.30)" strokeWidth="0.6" strokeLinecap="round" />
-      <ellipse cx="57" cy="74.5" rx="42" ry="4" fill="rgba(207,232,255,0.07)" />
-      <line x1="22" y1="78" x2="92" y2="78" stroke="rgba(207,232,255,0.12)" strokeWidth="0.75" />
-      <line x1="25" y1="83" x2="89" y2="83" stroke="rgba(207,232,255,0.08)" strokeWidth="0.65" />
-      <line x1="29" y1="88" x2="85" y2="88" stroke="rgba(207,232,255,0.05)" strokeWidth="0.56" />
-    </svg>
-  );
+export function PaperBoatMini({ size = 58, fade = 1 }: { size?: number; fade?: number }) {
+  return <div style={{ opacity: fade }}><PaperBoat size={size} state="still" showReflection /></div>;
 }

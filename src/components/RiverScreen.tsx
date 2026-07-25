@@ -1,4 +1,4 @@
-// Wathin｜未止 — RiverScreen  v2.0.1
+// Wathin｜未止 — RiverScreen  v2.1.0
 // 大量留白，聚焦船與文字；整體視覺乾淨、安靜
 'use client';
 import { useEffect, useState } from 'react';
@@ -68,14 +68,13 @@ export default function RiverScreen({ onNavigate, shoreCount, refreshShore }: Pr
 
   return (
     <div style={{ position: 'fixed', inset: 0, overflow: 'hidden' }}>
-      {/* Logo */}
-      <div style={{ position: 'absolute', top: `calc(env(safe-area-inset-top,0px) + ${SP.xxl - 4}px)`, left: SP.lg + 2, zIndex: 20, pointerEvents: 'none' }}>
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: SP.md - 1, marginBottom: SP.sm + 1 }}>
-          <span style={{ fontFamily: FONT_LOGO, fontSize: 33, fontWeight: 300, color: 'rgba(245,249,255,0.96)', letterSpacing: '0.055em', textShadow: '0 0 64px rgba(207,232,255,0.26),0 2px 28px rgba(0,0,0,0.65)' }}>Wathin</span>
-          <span style={{ fontFamily: FONT_LOGO, color: 'rgba(159,182,204,0.34)', fontSize: 25, fontWeight: 200 }}>|</span>
-          <span style={{ fontFamily: FONT_BODY, fontSize: 26, fontWeight: 300, color: 'rgba(245,249,255,0.94)', letterSpacing: '0.17em', textShadow: '0 0 64px rgba(207,232,255,0.22),0 2px 28px rgba(0,0,0,0.65)' }}>未止</span>
+      <div style={{ position: 'absolute', top: `calc(env(safe-area-inset-top,0px) + ${SP.xxl + 4}px)`, left: 0, right: 0, zIndex: 20, pointerEvents: 'none', textAlign: 'center' }}>
+        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: SP.md - 2, marginBottom: SP.sm + 1 }}>
+          <span style={{ fontFamily: FONT_LOGO, fontSize: 31, fontWeight: 300, color: 'rgba(245,249,255,0.97)', letterSpacing: '0.11em', textShadow: '0 0 52px rgba(207,232,255,0.25),0 2px 26px rgba(0,0,0,0.72)' }}>Wathin</span>
+          <span style={{ fontFamily: FONT_LOGO, color: 'rgba(207,232,255,0.46)', fontSize: 24, fontWeight: 200 }}>|</span>
+          <span style={{ fontFamily: FONT_BODY, fontSize: 24, fontWeight: 300, color: 'rgba(245,249,255,0.95)', letterSpacing: '0.19em', textShadow: '0 0 52px rgba(207,232,255,0.22),0 2px 26px rgba(0,0,0,0.72)' }}>未止</span>
         </div>
-        <p style={{ fontFamily: FONT_BODY, fontSize: 12, color: 'rgba(159,182,204,0.52)', letterSpacing: '0.20em', margin: 0 }}>把一句話放進河裡。</p>
+        <p style={{ fontFamily: FONT_BODY, fontSize: 12, color: 'rgba(207,232,255,0.58)', letterSpacing: '0.22em', margin: 0 }}>把一句話放進河裡。</p>
       </div>
 
       {river.boat && !open && (
@@ -86,8 +85,8 @@ export default function RiverScreen({ onNavigate, shoreCount, refreshShore }: Pr
 
       {river.boat && !open && (
         <div style={{ position: 'absolute', bottom: 'calc(env(safe-area-inset-bottom,0px) + 100px)', left: 0, right: 0, textAlign: 'center', zIndex: 15, pointerEvents: 'none' }}>
-          <p style={{ fontFamily: FONT_BODY, fontSize: 11, color: 'rgba(159,182,204,0.40)', letterSpacing: '0.20em', marginBottom: SP.sm + 2 }}>點擊紙船，看看今天遇見的話</p>
-          <div style={{ width: 36, height: 1, margin: '0 auto', background: 'linear-gradient(90deg,transparent,rgba(207,232,255,0.30),transparent)' }} />
+          <p style={{ fontFamily: FONT_BODY, fontSize: 12, color: 'rgba(207,232,255,0.48)', letterSpacing: '0.20em', lineHeight: 1.9, marginBottom: SP.sm + 2 }}>輕觸紙船，<br />讀一則船訊。</p>
+          <div style={{ width: 42, height: 1, margin: '0 auto', background: 'linear-gradient(90deg,transparent,rgba(207,232,255,0.48),transparent)', boxShadow: '0 0 10px rgba(207,232,255,.18)' }} />
         </div>
       )}
 

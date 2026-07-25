@@ -5,7 +5,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { PaperBoatMini } from './PaperBoat';
 import WathinWave from './WathinWave';
 import NavBar from './NavBar';
-import { loadShore, hoursLeft } from '@/lib/storage';
+import { loadShore, hoursLeft, releaseShore } from '@/lib/storage';
 import { COLOR, FONT_BODY, SP } from '@/lib/tokens';
 import type { ShoreBoat } from '@/lib/types';
 
@@ -14,9 +14,20 @@ interface Props { onNavigate: (screen: import('@/lib/types').Screen) => void; on
 export default function ShoreScreen({ onNavigate, onUpdate }: Props) {
   const [boats, setBoats] = useState<ShoreBoat[]>([]);
   const [openId, setOpenId] = useState<string | null>(null);
+  const [leavingId, setLeavingId] = useState<string | null>(null);
 
   const refresh = useCallback(() => { const b = loadShore(); setBoats(b); onUpdate(); }, [onUpdate]);
   useEffect(() => { refresh(); const t = setInterval(refresh, 60_000); return () => clearInterval(t); }, [refresh]);
+
+  const release = (id: string) => {
+    setLeavingId(id);
+    window.setTimeout(() => {
+      setBoats(releaseShore(id));
+      setOpenId(null);
+      setLeavingId(null);
+      onUpdate();
+    }, 620);
+  };
 
   return (
     <div style={{ position: 'fixed', inset: 0, zIndex: 50, background: `linear-gradient(180deg, #010910 0%, ${COLOR.deepBlue} 44%, #0C2542 100%)`, display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
@@ -50,7 +61,7 @@ export default function ShoreScreen({ onNavigate, onUpdate }: Props) {
             const isOpen = openId === b.id;
             return (
               <div key={b.id} onClick={() => setOpenId(isOpen ? null : b.id)}
-                style={{ background: `linear-gradient(135deg, ${COLOR.navy}C7, #030C26DB)`, border: '1px solid rgba(207,232,255,0.08)', borderRadius: 16, padding: `${SP.md + 2}px ${SP.base}px`, cursor: 'pointer', opacity: fade, position: 'relative', overflow: 'hidden', transition: 'opacity 0.28s,border-color 0.16s', minHeight: 78 }}
+                style={{ background: `linear-gradient(135deg, ${COLOR.navy}C7, #030C26DB)`, border: '1px solid rgba(207,232,255,0.10)', borderRadius: 16, padding: `${SP.md + 2}px ${SP.base}px`, cursor: 'pointer', opacity: leavingId === b.id ? 0 : fade, transform: leavingId === b.id ? 'translateX(48px) scale(.96)' : 'none', position: 'relative', overflow: 'hidden', transition: 'opacity 0.62s ease,transform 0.62s ease,border-color 0.16s', minHeight: 78 }}
                 onMouseEnter={e => (e.currentTarget.style.borderColor = 'rgba(207,232,255,0.20)')}
                 onMouseLeave={e => (e.currentTarget.style.borderColor = 'rgba(207,232,255,0.08)')}>
                 <div style={{ position: 'absolute', bottom: 0, left: 0, height: 2, width: `${(1 - prog) * 100}%`, background: 'linear-gradient(90deg,rgba(207,232,255,0.38),rgba(207,232,255,0.04))', transition: 'width 60s linear' }} />
@@ -61,6 +72,7 @@ export default function ShoreScreen({ onNavigate, onUpdate }: Props) {
                   <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', minHeight: 48 }}>
                     <p data-protected-message="true" onContextMenu={e => e.preventDefault()} style={{ fontFamily: FONT_BODY, fontSize: 13.5, color: 'rgba(245,249,255,0.94)', margin: 0, lineHeight: 1.68, flex: 1, overflow: isOpen ? 'visible' : 'hidden', textOverflow: isOpen ? 'unset' : 'ellipsis', whiteSpace: isOpen ? 'normal' : 'nowrap', transition: 'all 0.26s' }}>{b.text.replace(/\n/g, ' ')}</p>
                     <p style={{ margin: '6px 0 0', fontSize: 11, color: 'rgba(159,182,204,0.36)', fontFamily: 'monospace', letterSpacing: '0.04em', textAlign: 'right' }}>{hoursLeft(b.exp)}</p>
+                    {isOpen && <button type="button" onClick={event => { event.stopPropagation(); release(b.id); }} style={{ alignSelf: 'flex-end', marginTop: 10, padding: '7px 12px', border: '1px solid rgba(207,232,255,.12)', borderRadius: 999, background: 'rgba(7,27,52,.48)', color: 'rgba(207,232,255,.58)', fontFamily: FONT_BODY, fontSize: 11, letterSpacing: '.12em', cursor: 'pointer' }}>讓它離開岸邊</button>}
                   </div>
                 </div>
               </div>
