@@ -25,7 +25,8 @@ export default function WaterCanvas() {
     const start = performance.now();
     const resize = () => {
       const ratio = Math.min(window.devicePixelRatio || 1, 2);
-      width = window.innerWidth; height = window.innerHeight;
+      width = window.innerWidth;
+      height = Math.max(window.innerHeight, canvas.parentElement?.clientHeight || 0);
       canvas.width = Math.round(width * ratio); canvas.height = Math.round(height * ratio);
       canvas.style.width = `${width}px`; canvas.style.height = `${height}px`;
       context.setTransform(ratio, 0, 0, ratio, 0, 0);
@@ -59,7 +60,7 @@ export default function WaterCanvas() {
     return () => { cancelAnimationFrame(frame); window.removeEventListener('resize', resize); };
   }, []);
 
-  return <div aria-hidden="true" className="water-stage" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 0, overflow: 'hidden', background: '#010812' }}>
+  return <div aria-hidden="true" className="water-stage" style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: 'var(--screen-height)', zIndex: 0, overflow: 'hidden', background: '#010812' }}>
     <picture>
       <source media="(max-width:600px)" srcSet="/assets/water-mobile-loop.webp" />
       <img className="river-loop" src="/assets/water-desktop-loop.webp" alt="" draggable={false} decoding="async" />
@@ -67,9 +68,6 @@ export default function WaterCanvas() {
     <canvas ref={effectsRef} style={{ position: 'absolute', inset: 0 }} />
     <style>{`
       .river-loop{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:saturate(.88) brightness(.86)}
-      @media (max-width:600px){
-        .water-stage{bottom:calc(-1 * max(env(safe-area-inset-bottom, 0px), 72px))!important}
-      }
     `}</style>
   </div>;
 }

@@ -3,6 +3,7 @@
 
 :root {
   --app-height: 100vh;
+  --screen-height: 100dvh;
   --c-deep:  #071B34;
   --c-navy:  #0D2A4A;
   --c-blue:  #123B63;
@@ -18,8 +19,8 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 html, body {
-  position: fixed; inset: 0;
-  height: 100%; min-height: 100%; width: 100%;
+  position: fixed; top: 0; left: 0;
+  height: var(--screen-height); min-height: var(--screen-height); width: 100%;
   overflow: hidden;
   background-color: #010812;
   background-image: url('/assets/water-mobile-loop.webp');
@@ -34,7 +35,7 @@ html, body {
   -webkit-user-select: none;
 }
 
-#__next { position: fixed; inset: 0; width: 100%; background: transparent; overflow: hidden; }
+#__next { position: fixed; top: 0; left: 0; height: var(--screen-height); width: 100%; background: transparent; overflow: hidden; }
 
 @media (min-width: 601px) {
   html, body { background-image: url('/assets/water-desktop-loop.webp'); }
