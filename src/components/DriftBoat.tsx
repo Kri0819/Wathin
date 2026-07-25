@@ -7,7 +7,7 @@ interface Props { onTap: () => void; onExit: () => void; }
 
 export default function DriftBoat({ onTap, onExit }: Props) {
   const motion = useMemo(() => ({
-    top: `${50 + Math.random() * 8}%`,
+    top: `${45 + Math.random() * 6}%`,
     duration: `${BOAT.driftSecondsMin + Math.random() * (BOAT.driftSecondsMax - BOAT.driftSecondsMin)}s`,
     delay: `${Math.random() * 0.8}s`,
   }), []);
