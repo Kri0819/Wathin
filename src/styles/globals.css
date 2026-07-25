@@ -44,6 +44,7 @@ body::after {
   right: 0;
   bottom: 0;
   height: env(safe-area-inset-bottom, 0px);
+  height: min(env(safe-area-inset-bottom, 0px), 34px);
   background: #010812;
   pointer-events: none;
 }
