@@ -35,7 +35,7 @@ export default function WaterCanvas() {
       x: random(),
       width: (far ? 0.05 : 0.09) + random() * (far ? 0.20 : 0.34),
       amp: (far ? 0.7 : 1.2) + random() * (far ? 1.2 : 2.4),
-      alpha: (far ? 0.04 : 0.055) + random() * (far ? 0.105 : 0.16),
+      alpha: (far ? 0.07 : 0.095) + random() * (far ? 0.16 : 0.25),
       speed: (random() - 0.5) * (far ? 0.11 : 0.18),
       phase: random() * Math.PI * 2,
     }));
@@ -75,7 +75,7 @@ export default function WaterCanvas() {
         if (!step) context.moveTo(px, py); else context.lineTo(px, py);
       }
       context.strokeStyle = gradient;
-      context.lineWidth = wave.y > 0.7 ? 0.8 : 0.52;
+      context.lineWidth = wave.y > 0.7 ? 1.15 : wave.y > .5 ? .82 : .58;
       context.stroke();
     };
 
@@ -131,13 +131,35 @@ export default function WaterCanvas() {
       context.fillRect(0, horizon - 55, width, 130);
 
       const waterBloom = context.createRadialGradient(moonX, horizon + 70, 8, moonX, horizon + 130, width * .62);
-      waterBloom.addColorStop(0, 'rgba(34,93,144,.16)');
-      waterBloom.addColorStop(.36, 'rgba(18,66,112,.08)');
+      waterBloom.addColorStop(0, 'rgba(42,109,164,.24)');
+      waterBloom.addColorStop(.36, 'rgba(22,77,127,.13)');
       waterBloom.addColorStop(1, 'rgba(4,19,39,0)');
       context.fillStyle = waterBloom;
       context.fillRect(0, horizon - 10, width, height - horizon + 10);
 
+      context.save();
+      context.globalCompositeOperation = 'screen';
       waves.forEach((wave) => drawWave(wave, time));
+
+      for (let crest = 0; crest < 21; crest += 1) {
+        const y = horizon + (height - horizon) * (.10 + crest * .041);
+        const drift = Math.sin(time * .13 + crest * 2.17) * width * .018;
+        const startX = width * (((crest * 37) % 91) / 100) - width * .16 + drift;
+        const span = width * (.19 + ((crest * 13) % 18) / 100);
+        const alpha = .085 + (crest % 5) * .017;
+        const shine = context.createLinearGradient(startX, 0, startX + span, 0);
+        shine.addColorStop(0, 'rgba(164,214,249,0)');
+        shine.addColorStop(.28, `rgba(164,214,249,${alpha})`);
+        shine.addColorStop(.57, `rgba(225,244,255,${alpha * 1.45})`);
+        shine.addColorStop(1, 'rgba(164,214,249,0)');
+        context.beginPath();
+        context.moveTo(startX, y);
+        context.bezierCurveTo(startX + span * .18, y - 5, startX + span * .31, y + 5, startX + span * .48, y);
+        context.bezierCurveTo(startX + span * .66, y - 5, startX + span * .82, y + 4, startX + span, y - 1);
+        context.strokeStyle = shine;
+        context.lineWidth = crest > 7 ? 1.15 : .78;
+        context.stroke();
+      }
 
       for (let band = 0; band < RIVER.reflectionBands; band += 1) {
         const progress = band / (RIVER.reflectionBands - 1);
@@ -156,6 +178,7 @@ export default function WaterCanvas() {
         context.fillStyle = gradient;
         context.fillRect(moonX + centerShift - half, y, half * 2, 0.7 + progress * 1.25);
       }
+      context.restore();
 
       const vignette = context.createRadialGradient(width * 0.5, height * 0.48, height * 0.09, width * 0.5, height * 0.48, Math.max(width, height) * 0.72);
       vignette.addColorStop(0, 'rgba(0,0,0,0)');
