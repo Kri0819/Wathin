@@ -31,17 +31,17 @@ export default function NavBar({ active, onNavigate, shoreCount }: Props) {
     <nav
       aria-label="主要分頁"
       style={{
-        position: 'absolute',
+        position: 'fixed',
         bottom: 0,
         left: 0,
         right: 0,
         width: '100%',
-        height: `calc(${nav.height}px + min(env(safe-area-inset-bottom,0px),34px))`,
+        height: 92,
         background: `linear-gradient(0deg,rgba(2,9,17,${nav.backgroundDarkness}) 0%,rgba(2,9,17,0.64) 64%,transparent 100%)`,
         display: 'grid',
         gridTemplateColumns: 'repeat(3,minmax(0,1fr))',
         alignItems: 'end',
-        padding: `0 ${nav.horizontalPadding}px calc(min(env(safe-area-inset-bottom,0px),34px) + ${nav.bottomPadding}px)`,
+        padding: `0 ${nav.horizontalPadding}px 10px`,
         zIndex: 30,
         borderTop: '1px solid rgba(207,232,255,.07)',
       }}
