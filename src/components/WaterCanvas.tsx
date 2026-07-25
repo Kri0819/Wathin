@@ -59,12 +59,17 @@ export default function WaterCanvas() {
     return () => { cancelAnimationFrame(frame); window.removeEventListener('resize', resize); };
   }, []);
 
-  return <div aria-hidden="true" style={{ position: 'fixed', inset: 0, width: '100vw', height: '100%', minHeight: '100dvh', zIndex: 0, overflow: 'hidden', background: '#010812' }}>
+  return <div aria-hidden="true" className="water-stage" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 0, overflow: 'hidden', background: '#010812' }}>
     <picture>
       <source media="(max-width:600px)" srcSet="/assets/water-mobile-loop.webp" />
       <img className="river-loop" src="/assets/water-desktop-loop.webp" alt="" draggable={false} decoding="async" />
     </picture>
     <canvas ref={effectsRef} style={{ position: 'absolute', inset: 0 }} />
-    <style>{`.river-loop{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:saturate(.88) brightness(.86)}`}</style>
+    <style>{`
+      .river-loop{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:saturate(.88) brightness(.86)}
+      @media (max-width:600px){
+        .water-stage{bottom:calc(-1 * max(env(safe-area-inset-bottom, 0px), 72px))!important}
+      }
+    `}</style>
   </div>;
 }

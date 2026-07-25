@@ -21,7 +21,11 @@ html, body {
   position: fixed; inset: 0;
   height: 100%; min-height: 100%; width: 100%;
   overflow: hidden;
-  background: #010812;
+  background-color: #010812;
+  background-image: url('/assets/water-mobile-loop.webp');
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
   color: var(--c-text);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -30,7 +34,11 @@ html, body {
   -webkit-user-select: none;
 }
 
-#__next { position: fixed; inset: 0; width: 100%; background: #010812; overflow: hidden; }
+#__next { position: fixed; inset: 0; width: 100%; background: transparent; overflow: hidden; }
+
+@media (min-width: 601px) {
+  html, body { background-image: url('/assets/water-desktop-loop.webp'); }
+}
 
 ::-webkit-scrollbar { width: 2px; }
 ::-webkit-scrollbar-track { background: transparent; }
