@@ -5,7 +5,7 @@ export const RIVER = {
   farWaveCount: 24,
   nearWaveCount: 42,
   reflectionBands: 24,
-  reflectionStrength: 0.32,
+  reflectionStrength: 0.46,
   waterBrightness: 1,
   vignetteOpacity: 0.58,
   emptyRiverDelayMin: 3000,

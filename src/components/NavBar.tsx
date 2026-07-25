@@ -33,8 +33,10 @@ export default function NavBar({ active, onNavigate, shoreCount }: Props) {
       style={{
         position: 'absolute',
         bottom: 0,
-        left: 0,
-        right: 0,
+        left: '50%',
+        right: 'auto',
+        width: 'min(100%, 680px)',
+        transform: 'translateX(-50%)',
         height: `calc(${nav.height}px + env(safe-area-inset-bottom,0px))`,
         background: `linear-gradient(0deg,rgba(2,9,17,${nav.backgroundDarkness}) 0%,rgba(2,9,17,0.64) 64%,transparent 100%)`,
         display: 'grid',
@@ -42,6 +44,7 @@ export default function NavBar({ active, onNavigate, shoreCount }: Props) {
         alignItems: 'end',
         padding: `0 ${nav.horizontalPadding}px calc(env(safe-area-inset-bottom,0px) + ${nav.bottomPadding}px)`,
         zIndex: 30,
+        borderTop: '1px solid rgba(207,232,255,.055)',
       }}
     >
       {ITEMS.map(({ screen, label }) => {
